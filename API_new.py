@@ -11,7 +11,7 @@ import time
 import sqlite_migrate
 from sqlite_migrate import migrate_db,migration_completed
 import threading
-import sqlite3
+
 
 API_KEY = "AIzaSyA6TaVEMUTmdZTg_mNyQloPOofZvmVDnnU"  #"AIzaSyDDYW_WFmYQn5xVOT3UadeZ1pQBOBSJ_Ts"  
 
@@ -145,7 +145,7 @@ class youtube_data_fetch():
         try:
             playlists_response = request.execute()
         except Exception as e:
-             print(e)    
+            print(e)    
         play_list_list =[]
         for i in range (0,range_limit):
             play_list = playlists_response.get("items", [])[i]
@@ -322,15 +322,15 @@ class youtube_data_fetch():
         fetch = False
         global channel_data_display,Search_completed,Details_button,condition_ok,Migrate_start
 
-        print("Before-->",Search_completed)
+        #print("Before-->",Search_completed)
         condition_ok = False
         if Search_completed == True and channel_data_display == False:
             condition_ok = True
         else:
             condition_ok = False     
-        print("condition_ok  --",condition_ok,", Migrate_start --",Migrate_start)     
+        #print("condition_ok  --",condition_ok,", Migrate_start --",Migrate_start)     
         if condition_ok == True and Migrate_start == False:
-            print("After-->",Search_completed)
+            #print("After-->",Search_completed)
             youtube_data_fetch.fetch_channel_name()
             Channel_id = cchannel_id
 
@@ -338,14 +338,14 @@ class youtube_data_fetch():
             #st.button("Reset", type="primary")
             Details_button = st.button('Get Detais',key="Details_button")
             if Details_button:
-                print("clikcked Details button")
+                #print("clikcked Details button")
                 fetch = True
                 st.write('Channel details...')
             else:
                 st.write('Press Get Details to get Channel details')
                 fetch = False
             if fetch == True:
-                print("Channel_ID ---->",Channel_id)
+                #print("Channel_ID ---->",Channel_id)
                 channel_details_out = youtube_data_fetch.channel_details(youtube,Channel_id ) 
                 playlist_details_out = youtube_data_fetch.playlist_details(youtube,Channel_id)
                 video_details_out = youtube_data_fetch.video_details(youtube)
@@ -366,18 +366,18 @@ class youtube_data_fetch():
                 #print(channel_ids)     
 
                      
-                print(Channel_id)
+                #print(Channel_id)
                 if Channel_id in channel_ids:
                     result = collection.update_one(
                         {"Channel_Id": channel_id},
                         {"$push": youtube_details},
                         upsert=False
                     )
-                    print ("Updated...")
+                    #print ("Updated...")
                     st.json(youtube_details,expanded=False)
                 else:
                     result = collection.insert_one(youtube_details)
-                    print("Inserted...")
+                    #print("Inserted...")
                     st.json(youtube_details,expanded=False)
                 
                     #print(channel_name_list)
@@ -402,16 +402,16 @@ class youtube_data_fetch():
         
         Channel_option = st.selectbox('Select the channel to migrate',(channel_name_list))
         st.write('You selected:', Channel_option)
-        print("Channel_option--->",Channel_option)
+        #print("Channel_option--->",Channel_option)
 
         Migrate_start = True
-        print ("Migrate_start status :::::::: ",Migrate_start)
+        #print ("Migrate_start status :::::::: ",Migrate_start)
         Migrate_button = st.button('Migrate',key="Migrate_button")
-        print ("Migrate_button status::::::: ",Migrate_button)
+        #print ("Migrate_button status::::::: ",Migrate_button)
         if Migrate_button == True:
-            print("clikcked Migrate button")
+            #print("clikcked Migrate button")
             migrate_db(channel_name= Channel_option)
-            print("Migrating!!!!!!!!!...")
+            #print("Migrating!!!!!!!!!...")
             Migrate_start = False
             client.close()
 
@@ -488,7 +488,7 @@ def detailize(data,keys):
     combined_data = {}
     for i in range(len(keys)):
         combined_data[keys[i]] = data[0][i]
-    print(combined_data)
+    #print(combined_data)
     return(combined_data)
 
 
@@ -497,26 +497,26 @@ def query():
     Query_select = st.selectbox('Select the query',(Queries))
 
     st.write('You selected query:', Query_select) 
-    print(Query_select)
+    #print(Query_select)
     sqlite_connection = sqlite3.connect(SQLITE_DB_PATH)
     sqlite_cursor = sqlite_connection.cursor() 
-    print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    #print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
     if Query_select == "Get highest subscribers wise list":
         query_out = sqlite_cursor.execute(Max_subscribers_list_query)
         query_result = (list(query_out))
-        print(query_result)
+        #print(query_result)
         query_1_details = ("Channel_name","Subsciption_count")
         for val_tuple in query_result:
             merged_dict = {query_1_details[0]: val_tuple[0], query_1_details[1]: val_tuple[1]}
             result.append(merged_dict)
 
-        print(result)
+        #print(result)
         st.json(result,expanded=False)
 
     if Query_select == "Get highest viewed video":
         query_out = sqlite_cursor.execute(Max_viewed_video_query)
         query_result = (list(query_out))
-        print(query_result)
+        #print(query_result)
         keys = ("Channel_name", "Video_title", "View_counts")
         result = detailize(query_result,keys)  
         st.json(result,expanded=False)
@@ -524,7 +524,7 @@ def query():
     if Query_select == "Get lowest viewed video":
         query_out = sqlite_cursor.execute(Min_viewed_video_query)
         query_result = (list(query_out))
-        print(query_result)
+        #print(query_result)
         keys = ("Channel_name", "Video_title", "View_counts")
         result = detailize(query_result,keys)  
         st.json(result,expanded=False)  
@@ -532,7 +532,7 @@ def query():
     if Query_select == "Get highest liked video":
         query_out = sqlite_cursor.execute(Max_liked_video_query)
         query_result = (list(query_out))
-        print(query_result)
+        #print(query_result)
         keys = ("Channel_name", "Video_title", "Like_counts")
         result = detailize(query_result,keys)  
         st.json(result,expanded=False)   
@@ -540,7 +540,7 @@ def query():
     if Query_select == "Get lowest liked video":
         query_out = sqlite_cursor.execute(Min_liked_video_query)
         query_result = (list(query_out))
-        print(query_result)
+        #print(query_result)
         keys = ("Channel_name", "Video_title", "Like_counts")
         result = detailize(query_result,keys)  
         st.json(result,expanded=False)        
@@ -548,7 +548,7 @@ def query():
     if Query_select == "Get highest playlist count":
         query_out = sqlite_cursor.execute(Max_playlist_count_query)
         query_result = (list(query_out))
-        print(query_result)
+        #print(query_result)
         keys = ("Channel_name", "Playlist_title", "Playlist_video_count")
         result = detailize(query_result,keys)  
         st.json(result,expanded=False)
@@ -556,7 +556,7 @@ def query():
     if Query_select == "Get highest video count channel":
         query_out = sqlite_cursor.execute(Max_video_count_query)
         query_result = (list(query_out))
-        print(query_result)
+        #print(query_result)
         keys = ("Channel_name", "Video_Count")
         result = detailize(query_result,keys)  
         st.json(result,expanded=False)   
@@ -564,7 +564,7 @@ def query():
     if Query_select == "Get lowest video count channel":
         query_out = sqlite_cursor.execute(Min_video_count_query)
         query_result = (list(query_out))
-        print(query_result)
+        #print(query_result)
         keys = ("Channel_name", "Video_Count")
         result = detailize(query_result,keys)  
         st.json(result,expanded=False) 
@@ -572,7 +572,7 @@ def query():
     if Query_select == "Get highest Channel views having channel":
         query_out = sqlite_cursor.execute(Max_Channel_views_query)
         query_result = (list(query_out))
-        print(query_result)
+        #print(query_result)
         keys = ("Channel_name", "Channel_views_count")
         result = detailize(query_result,keys)  
         st.json(result,expanded=False)   
@@ -580,7 +580,7 @@ def query():
     if Query_select == "Get lowest Channel views having channel":
         query_out = sqlite_cursor.execute(Min_Channel_views_query)
         query_result = (list(query_out))
-        print(query_result)
+        #print(query_result)
         keys = ("Channel_name", "Channel_views_count")
         result = detailize(query_result,keys)  
         st.json(result,expanded=False) 
@@ -592,7 +592,7 @@ search_channel()
                  
 youtube_data_fetch.main1()
 # t2 = threading.Thread(target=youtube_data_fetch.main1())
-print ("channel_data_display---",channel_data_display)
+#print ("channel_data_display---",channel_data_display)
 # t2.start()
 #t2.join()
 
