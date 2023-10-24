@@ -1,10 +1,1 @@
 streamlit
-google-api-python-client
-pprint
-json
-pymongo
-pandas
-numpy
-sqlite3
-time
-threading
