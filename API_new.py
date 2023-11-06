@@ -43,7 +43,7 @@ global Search_completed
 
 def search_channel():
     global cchannel_name,Search_completed
-    cchannel_name = st.text_input("Enter Channel name:")
+    cchannel_name = st.sidebar.text_input("Enter Channel name:")
     search_response = youtube.search().list(q=cchannel_name,type='video',part='id,snippet',maxResults=10).execute()
     search_response_raw = search_response.get("items", [])
 
@@ -309,9 +309,9 @@ class youtube_data_fetch():
             return None
 
         if channel_name_fetch:
-            st.write('The Channel --',channel_name_fetch,' is already there')
+            st.sidebar.write('The Channel --',channel_name_fetch,' is already there')
         else:
-            st.write("Entered Channel ID is not already there, Data's fetching.. ") 
+            st.sidebar.write("Entered Channel ID is not already there, Data's fetching.. ") 
 
  
 
@@ -336,13 +336,13 @@ class youtube_data_fetch():
 
             #Channel_id = st.text_input("Enter Channel ID:")
             #st.button("Reset", type="primary")
-            Details_button = st.button('Get Detais',key="Details_button")
+            Details_button = st.sidebar.button('Get Detais',key="Details_button")
             if Details_button:
                 #print("clikcked Details button")
                 fetch = True
-                st.write('Channel details...')
+                st.sidebar.write('Channel details...')
             else:
-                st.write('Press Get Details to get Channel details')
+                st.sidebar.write('Press Get Details to get Channel details')
                 fetch = False
             if fetch == True:
                 #print("Channel_ID ---->",Channel_id)
@@ -400,13 +400,13 @@ class youtube_data_fetch():
             return None     
         #if channel_data_display == True:   
         
-        Channel_option = st.selectbox('Select the channel to migrate',(channel_name_list))
-        st.write('You selected:', Channel_option)
+        Channel_option = st.sidebar.selectbox('Select the channel to migrate',(channel_name_list))
+        st.sidebar.write('You selected:', Channel_option)
         #print("Channel_option--->",Channel_option)
 
         Migrate_start = True
         #print ("Migrate_start status :::::::: ",Migrate_start)
-        Migrate_button = st.button('Migrate',key="Migrate_button")
+        Migrate_button = st.sidebar.button('Migrate',key="Migrate_button")
         #print ("Migrate_button status::::::: ",Migrate_button)
         if Migrate_button == True:
             #print("clikcked Migrate button")
@@ -494,9 +494,9 @@ def detailize(data,keys):
 
 def query():
     result = []
-    Query_select = st.selectbox('Select the query',(Queries))
+    Query_select = st.sidebar.selectbox('Select the query',(Queries))
 
-    st.write('You selected query:', Query_select) 
+    st.sidebar.write('You selected query:', Query_select) 
     #print(Query_select)
     sqlite_connection = sqlite3.connect(SQLITE_DB_PATH)
     sqlite_cursor = sqlite_connection.cursor() 
