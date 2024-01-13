@@ -61,9 +61,11 @@ def search_channel():
         else:
             None                             
     #pprint(search_details_formated_list) 
+    Search_details_df = pd.DataFrame(search_details_formated_list)        
     if cchannel_name and search_details_formated_list:
         #print("@@@@@@@@@")
-        st.json(search_details_formated_list,expanded=False)
+        # st.json(search_details_formated_list,expanded=False)
+        st.dataframe(Search_details_df)
         # df = pd.DataFrame(np.random.randn(10, 2), columns=("col %d" % i for i in range(2)))
     Search_completed = False    
     if cchannel_name:
@@ -277,6 +279,7 @@ class youtube_data_fetch():
             #print ("*****************************")
             #pprint(cmd_details)
             if cmd_details:
+                try:    
                     cmd_snippet = cmd_details["items"]
                     cmd_snippet_1 = cmd_snippet[0]["snippet"]
                     cmd_snippet_snippet_1 = cmd_snippet_1["topLevelComment"]
@@ -289,6 +292,8 @@ class youtube_data_fetch():
                         "Text": cmd_snippet_snippet["textOriginal"]
                     }
                     cmd_details_formated_list.append(cmd_detailss)
+                except Exception as e:
+                    print(e)    
         #msg_details_list.append(msg_details)
 
         #pprint(msg_details_list)
@@ -320,73 +325,78 @@ class youtube_data_fetch():
     
 
     def main1():
-        fetch = False
-        global channel_data_display,Search_completed,Details_button,condition_ok,Migrate_start
+        try:
+            fetch = False
+            global channel_data_display,Search_completed,Details_button,condition_ok,Migrate_start
 
-        #print("Before-->",Search_completed)
-        condition_ok = False
-        if Search_completed == True and channel_data_display == False:
-            condition_ok = True
-        else:
-            condition_ok = False     
-        #print("condition_ok  --",condition_ok,", Migrate_start --",Migrate_start)     
-        if condition_ok == True and Migrate_start == False:
-            print("After-->",Search_completed)
-            youtube_data_fetch.fetch_channel_name()
-            Channel_id = cchannel_id
-
-            #Channel_id = st.text_input("Enter Channel ID:")
-            #st.button("Reset", type="primary")
-            Details_button = st.button('Get Detais',key="Details_button")
-            if Details_button:
-                #print("clikcked Details button")
-                fetch = True
-                st.write('Channel details...')
+            #print("Before-->",Search_completed)
+            condition_ok = False
+            if Search_completed == True and channel_data_display == False:
+                condition_ok = True
             else:
-                st.write('Press Get Details to get Channel details')
-                fetch = False
-            if fetch == True:
-                #print("Channel_ID ---->",Channel_id)
-                channel_details_out = youtube_data_fetch.channel_details(youtube,Channel_id ) 
-                playlist_details_out = youtube_data_fetch.playlist_details(youtube,Channel_id)
-                video_details_out = youtube_data_fetch.video_details(youtube)
-                cmd_details_out = youtube_data_fetch.cmd_details(youtube)
-                youtube_details = []
-                youtube_details = {"channel_details":channel_details_out,"playlist_details":playlist_details_out,"video_details":video_details_out,"command_details":cmd_details_out}
-                #print(youtube_details)
+                condition_ok = False     
+            #print("condition_ok  --",condition_ok,", Migrate_start --",Migrate_start)     
+            if condition_ok == True and Migrate_start == False:
+                print("After-->",Search_completed)
+                youtube_data_fetch.fetch_channel_name()
+                Channel_id = cchannel_id
 
-
-
-                cursor = collection.find()
-                channel_ids = []
-                channel_name_lists = []
-                for document in cursor:
-                    if "channel_details" in document and "Channel_Id" in document["channel_details"]:
-                        channel_id = document["channel_details"]["Channel_Id"]
-                        channel_ids.append(channel_id)
-                #print(channel_ids)     
-
-                     
-                #print(Channel_id)
-                if Channel_id in channel_ids:
-                    result = collection.update_one(
-                        {"Channel_Id": channel_id},
-                        {"$push": youtube_details},
-                        upsert=False
-                    )
-                    #print ("Updated@@@@@@@@@@@2...")
-                    
-                    st.json(youtube_details,expanded=False)
+                #Channel_id = st.text_input("Enter Channel ID:")
+                #st.button("Reset", type="primary")
+                Details_button = st.button('Get Detais',key="Details_button")
+                if Details_button:
+                    #print("clikcked Details button")
+                    fetch = True
+                    st.write('Channel details...')
                 else:
-                    result = collection.insert_one(youtube_details)
-                    #print("Inserted@@@@@@@@@@@@@@@...")
-                    st.json(youtube_details,expanded=False)
-                
-                    #print(channel_name_list)
-                    #return channel_name_fetch
-                    
-                channel_data_display = True 
-        Search_completed = False         
+                    st.write('Press Get Details to get Channel details')
+                    fetch = False
+                if fetch == True:
+                    #print("Channel_ID ---->",Channel_id)
+                    channel_details_out = youtube_data_fetch.channel_details(youtube,Channel_id ) 
+                    playlist_details_out = youtube_data_fetch.playlist_details(youtube,Channel_id)
+                    video_details_out = youtube_data_fetch.video_details(youtube)
+                    cmd_details_out = youtube_data_fetch.cmd_details(youtube)
+                    youtube_details = []
+                    youtube_details = {"channel_details":channel_details_out,"playlist_details":playlist_details_out,"video_details":video_details_out,"command_details":cmd_details_out}
+                    #print(youtube_details)
+
+
+
+                    cursor = collection.find()
+                    channel_ids = []
+                    channel_name_lists = []
+                    for document in cursor:
+                        if "channel_details" in document and "Channel_Id" in document["channel_details"]:
+                            channel_id = document["channel_details"]["Channel_Id"]
+                            channel_ids.append(channel_id)
+                    #print(channel_ids)     
+
+                    # youtube_details_df = pd.DataFrame(youtube_details)    
+                    #print(Channel_id)
+                    if Channel_id in channel_ids:
+                        result = collection.update_one(
+                            {"Channel_Id": channel_id},
+                            {"$push": youtube_details},
+                            upsert=False
+                        )
+                        #print ("Updated@@@@@@@@@@@2...")
+
+                        st.json(youtube_details,expanded=False)
+                        # st.dataframe(youtube_details_df)
+                    else:
+                        result = collection.insert_one(youtube_details)
+                        #print("Inserted@@@@@@@@@@@@@@@...")
+                        st.json(youtube_details,expanded=False)
+                        # st.dataframe(youtube_details_df)
+
+                        #print(channel_name_list)
+                        #return channel_name_fetch
+
+                    channel_data_display = True 
+            Search_completed = False 
+        except Exception as e:
+                print(e)                 
 
     def migrate():
         global channel_name_list,Migrate_start
@@ -496,9 +506,9 @@ def detailize(data,keys):
 
 def query():
     result = []
-    Query_select = st.sidebar.selectbox('Select the query',(Queries))
+    Query_select = st.selectbox('Select the query',(Queries))
 
-    st.sidebar.write('You selected query:', Query_select) 
+    st.write('You selected query:', Query_select) 
     #print(Query_select)
     sqlite_connection = sqlite3.connect(SQLITE_DB_PATH)
     sqlite_cursor = sqlite_connection.cursor() 
@@ -510,7 +520,7 @@ def query():
         query_1_details = ("Channel_name","Subsciption_count")
         for val_tuple in query_result:
             merged_dict = {query_1_details[0]: val_tuple[0], query_1_details[1]: val_tuple[1]}
-            result.append(merged_dict)
+            result.append(merged_dict) 
 
         st.json(result,expanded=False)
 
@@ -527,7 +537,8 @@ def query():
         query_result = (list(query_out))
         #print(query_result)
         keys = ("Channel_name", "Video_title", "View_counts")
-        result = detailize(query_result,keys)  
+        result = detailize(query_result,keys) 
+
         st.json(result,expanded=False)  
 
     if Query_select == "Get highest liked video":
@@ -535,7 +546,7 @@ def query():
         query_result = (list(query_out))
         #print(query_result)
         keys = ("Channel_name", "Video_title", "Like_counts")
-        result = detailize(query_result,keys)  
+        result = detailize(query_result,keys) 
         st.json(result,expanded=False)   
 
     if Query_select == "Get lowest liked video":
@@ -543,7 +554,7 @@ def query():
         query_result = (list(query_out))
         #print(query_result)
         keys = ("Channel_name", "Video_title", "Like_counts")
-        result = detailize(query_result,keys)  
+        result = detailize(query_result,keys) 
         st.json(result,expanded=False)        
 
     if Query_select == "Get highest playlist count":
@@ -559,7 +570,7 @@ def query():
         query_result = (list(query_out))
         #print(query_result)
         keys = ("Channel_name", "Video_Count")
-        result = detailize(query_result,keys)  
+        result = detailize(query_result,keys) 
         st.json(result,expanded=False)   
 
     if Query_select == "Get lowest video count channel":
@@ -567,7 +578,7 @@ def query():
         query_result = (list(query_out))
         #print(query_result)
         keys = ("Channel_name", "Video_Count")
-        result = detailize(query_result,keys)  
+        result = detailize(query_result,keys) 
         st.json(result,expanded=False) 
 
     if Query_select == "Get highest Channel views having channel":
